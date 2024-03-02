@@ -1,0 +1,39 @@
+service: xcad-kms-auth
+
+custom:
+  prefix: /xcad
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+  jest:
+    collectCoverage: true
+  serverless-offline:
+    host: 0.0.0.0
+plugins:
+  - serverless-webpack
+  - serverless-offline
+  - serverless-jest-plugin
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  apiGateway:
+    minimumCompressionSize: 1024
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+
+functions:
+  price:
+    handler: handlers/price.handler
+    events:
+      - http:
+          method: post
+          path: ${self:custom.prefix}/price
+  balance:
+    handler: handlers/balances.handler
+    events:
+      - http:
+          method: post
+          path: ${self:custom.prefix}/contract/balance
